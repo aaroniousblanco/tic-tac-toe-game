@@ -73,6 +73,13 @@ function cpuMove() {
   }
   randomSpot = spotsLeft[(getRandomInt(spotsLeft.length))];
   $(randomSpot).text(player2.icon);
+  checkForWinner(player2.icon);
+    if (winner === true) {
+      $("#winnerdeclaration").text("Machine wins!");
+      player2.gamesWon += 1;
+      $('#winsPlayer2').text(player2.gamesWon);
+      $(".square").addClass("disableclick");
+    }
   tries += 1;
 }
 
@@ -88,7 +95,7 @@ $(document).ready(function() {
 
   $('input:radio').change(
     function(){
-        if($(this).val() == 'CPU') {
+        if($(this).val() === 'CPU') {
             $(".square").text("");
             cpuBool = true;
             $("#winnerdeclaration").text("Your move!");
@@ -129,14 +136,13 @@ $(document).ready(function() {
       tries += 1;
       checkForTie(tries, winner);
       if (tries < 9 && cpuBool === true && winner === false) {//not registering when cpu wins
-        $("#winnerdeclaration").text("Be patient, I'm thinking...");
+        $("#winnerdeclaration").text("I'm thinking...");
         setTimeout(function() {
+          $("#winnerdeclaration").text("Okay, you're move...");
           cpuMove();
-          $("#winnerdeclaration").text("");
         }, 2000);
         playerIcon = player1.icon;
       }
-      checkForWinner(player2.icon);
   }); //end of '.square' click
 
 
