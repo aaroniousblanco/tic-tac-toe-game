@@ -71,8 +71,9 @@ function cpuMove() {
       spotsLeft.push("#" + i);
     }
   }
-  randomSpot = spotsLeft[(getRandomInt(spotsLeft.length))];
-  $(randomSpot).text(player2.icon);
+  randomSpot = winComboCheckerFunction(board, player1);
+  let randomSpotString = "#" + randomSpot;
+  $(randomSpotString).text(player2.icon);
   checkForWinner(player2.icon);
     if (winner === true) {
       $("#winnerdeclaration").text("Machine wins!");
@@ -83,12 +84,80 @@ function cpuMove() {
   tries += 1;
 }
 
-// function cpuMoveLogic(board, spotsLeft) {
-//   if (player1.icon === board.sq1) {
-//     $(randomSpot).text(player2.icon);
-//   }
-// }
-
+let winComboCheckerFunction = (board, player) => {
+    let win_combos = [[0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]];
+    let arrayed_board = [];
+    let block_count = 0;
+    let attack_count = 0;
+    let block_array = null;
+    let attack_array = null;
+    let open_spaces = [];
+    let win_combos_check_array = [];
+    let block_move_open = null;
+    for (var key in board) {
+        arrayed_board.push(board[key]);
+    };
+    for (i = 0; i < arrayed_board.length; i++) {
+        if (arrayed_board[i] === '') {
+            open_spaces.push(i);
+        }
+    }
+    win_combos_check_array = win_combos.map(item => {
+        let counter = 0;
+        for (i = 0; i < 3; i++) {
+            if (arrayed_board[item[i]] === player.icon) {
+                counter++;
+            } else if (arrayed_board[item[i]] !== player.icon && arrayed_board[item[i]] !== "") {
+                counter--;
+            }
+        }
+        return counter;
+    });
+    for (i = 0; i < win_combos_check_array.length; i++) { //count potential winning combos
+        if (win_combos_check_array[i] === 2) {
+            block_count++;
+        } else if (win_combos_check_array[i] === -2) {
+            attack_count++;
+        }
+    }
+    if (attack_count > 0) {
+        for (i = 0; i < 8; i++) {
+            if (win_combos_check_array[i] === -2) {
+                attack_array = win_combos[i];
+            }
+        }
+        for (i = 0; i < 3; i++) {
+            if (arrayed_board[attack_array[i]] === '') {
+                attack_move_index = i;
+            }
+        }
+        attack_count = 0;
+        return attack_array[attack_move_index];
+    } else if (block_count >= 1) { //if potential winning combinations number only one, enter this conditional block
+        for (i = 0; i < 8; i++) {
+            if (win_combos_check_array[i] === 2) {
+                block_array = win_combos[i];
+            }
+        }
+        for (i = 0; i < 3; i++) {
+            if (arrayed_board[block_array[i]] === '') {
+                block_move_index = i;
+            }
+        }
+        block_count = 0;
+        return block_array[block_move_index];
+    } else {
+        block_move_index = open_spaces[Math.floor(Math.random() * (open_spaces.length))];
+        return block_move_index;
+    }
+};
 
 //main jQuery section
 $(document).ready(function() {
